@@ -1,6 +1,7 @@
 package game;
 
 /**
+ * Questa classe é il server al quale i client si collegano e fanno le richieste
  *
  * @author Gioele Cavallo
  * @version 07.09.2021
@@ -13,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,8 +28,17 @@ public class DateServer {
     private static ArrayList<Player> players = new ArrayList<>();
     private static GameHandler gameHandler = new GameHandler();
 
-    public static void main(String[] args) {
+    public static ArrayList<ClientHandler> getClientHandler() {
+        return clients;
+    }
 
+    public static void endRoundInfo(String token) {
+        Game gm = gameHandler.getGameFromToken(token);
+        List<Player> plrs = gm.getPlayers();
+        for (Player plr : plrs) {
+            plr.setFinished(false);
+            plr.deleteGuessedChar();
+        }
     }
 
     public static GameHandler getGameHandler() {
@@ -76,18 +87,20 @@ public class DateServer {
         removePlayerFromGame(player);
     }
 
-    public static void removePlayerFromGame(Player plr){
-        for(Game gm : gameHandler.getGames()){
+    public static void removePlayerFromGame(Player plr) {
+        for (Game gm : gameHandler.getGames()) {
             if (gm.getToken().equals(plr.getToken())) {
                 plr = getPlayer(plr);
                 gm.removePlayer(plr);
                 plr.setAdmin(false);
                 plr.setIsOnGameStarted(false);
                 plr.setErrors(0);
+                plr.getGuessedChars().removeAll(plr.getGuessedChars());
                 return;
             }
         }
     }
+
     public static void removeHandler(ClientHandler handler) {
         clients.remove(handler);
     }
@@ -108,13 +121,16 @@ public class DateServer {
     public static void go() throws IOException {
 
         System.out.println("Welcome to the server");
+        // apre la porta alla quale si collegheranno i client
         ServerSocket listener = new ServerSocket(PORT);
 
         while (true) {
             System.out.println("[SERVER] Waiting for client connection...");
+            // aspetta che si colleghi un client
             Socket client = listener.accept();
             System.out.println("[SERVER] Client connected.");
 
+            // crea un ClientHandler per il client appena connesso
             ClientHandler clientThread = new ClientHandler(client, clients);
             clients.add(clientThread);
             pool.execute(clientThread);
@@ -126,5 +142,9 @@ public class DateServer {
     public static String getRandomName() {
         String name = names[(int) (Math.random() * names.length)];
         return name;
+    }
+    
+    public static void main(String[] args) throws IOException{
+        DateServer.go();
     }
 }

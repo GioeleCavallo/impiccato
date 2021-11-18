@@ -5,12 +5,15 @@ package game;
  * @author gioele.cavallo
  * @version 30.09.2021
  */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.Timer;
 
 public class Game {
 
@@ -46,7 +49,7 @@ public class Game {
             throw new IllegalArgumentException("insert a valid argument");
         }
     }
-    
+
     public void setStarted(boolean started) {
         this.started = started;
     }
@@ -88,11 +91,11 @@ public class Game {
     }
 
     public void setTime(int time) {
-        if (time >= 30) {
-            this.time = time;
-        } else {
+        //if (time >= 30) {
+        this.time = time;
+        /*} else {
             this.time = 30;
-        }
+        }*/
     }
 
     public int getTime() {
@@ -113,19 +116,78 @@ public class Game {
     }
 
     public void startGame() {
+
         this.startTime = System.currentTimeMillis();
-        for (Player plr : this.players){
+        //this.currentRound = -1;
+        for (Player plr : this.players) {
             plr.setIsOnGameStarted(true);
         }
+        ArrayList<ClientHandler> clients = DateServer.getClientHandler();
+        for (ClientHandler aClient : clients) {
+            aClient.outToGame(this.getPlayers().get(0), " Game started");
+        }
+        startRound();
+        //this.startTimer(500);
     }
 
-    /* public void endGame(){
-        this.currentRound
-    }*/
-    
+    public void endGame() {
+        // print podium
+
+        List<Player> players = this.getPlayers();
+        ArrayList<ClientHandler> clients = DateServer.getClientHandler();
+        for (ClientHandler aClient : clients) {
+            aClient.outToGame(this.getPlayers().get(0), "Game finished!!!");
+        }
+        /**
+         * for (Player plr : players) {
+         * DateServer.removePlayerFromGame(DateServer.getPlayer(plr)); }
+         */
+
+        for (int i = 0; i < players.size(); i++) {
+            DateServer.removePlayerFromGame(DateServer.getPlayer(players.get(i)));
+        }
+
+        DateServer.removeGame(this);
+    }
+
+    ActionListener taskPerformer = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            endRound();
+            DateServer.endRoundInfo(getToken());
+            currentRound++;
+            startRound();
+
+        }
+    };
+
+    private void startTimer(int time) {
+
+        Timer timer = new Timer(time, taskPerformer);
+        timer.setRepeats(false);
+        timer.start();
+
+    }
+
     public void endRound() {
         this.startTime = System.currentTimeMillis();
-        this.currentRound++;
+        //startRound();
+    }
+
+    public void startRound() {
+        
+        if (this.currentRound < this.rounds) {
+            this.startTimer(this.time * 1000 + 800);
+            ArrayList<ClientHandler> clients = DateServer.getClientHandler();
+            for (ClientHandler aClient : clients) {
+                aClient.outToGame(this.getPlayers().get(0), "Round started");
+            }
+            List<Player> players = this.getPlayers();
+            for (Player plr : players) {
+                DateServer.getPlayer(plr).setFinished(false);
+            }
+        } else {
+            this.endGame();
+        }
     }
 
     public int getCurrentRound() {
@@ -151,7 +213,7 @@ public class Game {
 
                     parola = lines.get((int) (Math.random() * lines.size()));
                     for (int j = 0; j < parola.length(); j++) {
-                        utile = (parola.charAt(j) >= 'a' && parola.charAt(j) <= 'z' 
+                        utile = (parola.charAt(j) >= 'a' && parola.charAt(j) <= 'z'
                                 || parola.charAt(j) >= 'A' && parola.charAt(j) <= 'Z') && utile && parola.length() >= 4;
                     }
                 } while (!utile);
@@ -178,9 +240,6 @@ public class Game {
     }
 
     public static void main(String[] args) {
-        Game game = new Game(30,5);
-        System.out.println(game.getWords());
-        System.out.println("end");
-        
+
     }
 }

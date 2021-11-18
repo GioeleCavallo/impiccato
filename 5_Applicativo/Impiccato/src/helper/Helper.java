@@ -85,16 +85,15 @@ public class Helper {
         return false;
     }
 
-    public static boolean charsArrayContainsChar(ArrayList<String> chars, char c){
-        for(int i = 0; i < chars.size();i++){
-            if((chars.get(i).charAt(0)) == c){
+    public static boolean charsArrayContainsChar(ArrayList<String> chars, char c) {
+        for (int i = 0; i < chars.size(); i++) {
+            if ((chars.get(i).charAt(0)) == c) {
                 return true;
             }
         }
         return false;
     }
-    
-    
+
     /*public static void main(String[] args) {
         
     }*/

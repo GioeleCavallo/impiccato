@@ -17,6 +17,7 @@ public class Player {
     private boolean isAdmin;
     private int errors;
     private boolean isStarted;
+    private boolean finished;
     private ArrayList<String> guessedChars;
 
     public Player(String name) {
@@ -36,17 +37,30 @@ public class Player {
             this.errors = 0;
             this.isStarted = false;
             this.guessedChars = new ArrayList<>();
+            this.finished = false;
         } else {
             throw new IllegalArgumentException("The name is not valid");
         }
     }
 
+    public void setFinished(boolean finish) {
+        this.finished = finish;
+    }
+
+    public boolean getFinished() {
+        return this.finished;
+    }
+
     public ArrayList<String> getGuessedChars() {
         return this.guessedChars;
     }
-    
-    public void addGuessedChar(String character){
+
+    public void addGuessedChar(String character) {
         this.guessedChars.add(character);
+    }
+
+    public void deleteGuessedChar() {
+        this.guessedChars.removeAll(this.guessedChars);
     }
 
     public int getErrors() {
@@ -90,10 +104,10 @@ public class Player {
         this.token = token;
     }
 
-    public void setIsOnGameStarted(boolean bool){
+    public void setIsOnGameStarted(boolean bool) {
         this.isStarted = bool;
     }
-    
+
     public boolean isOnGameStarted() {
         return this.isStarted;
     }
@@ -105,6 +119,12 @@ public class Player {
     public void setPoints(int points) {
         if (points >= 0) {
             this.points = points;
+        }
+    }
+
+    public void addPoints(int points) {
+        if (points >= 0) {
+            this.points += points;
         }
     }
 
