@@ -6,12 +6,11 @@ package game;
  * @author Gioele Cavallo
  * @version 07.09.2021
  */
-import java.io.BufferedReader;
+
+import exceptions.InvalidNameException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +48,12 @@ public class DateServer {
         return clients.size();
     }
 
-    public static void addPlayer(Player player) {
+    public static void addPlayer(Player player) throws InvalidNameException {
+        for(Player plr : players){
+            if(plr.getName().equals(player.getName())){
+                throw new InvalidNameException();
+            }
+        }
         players.add(player);
     }
 

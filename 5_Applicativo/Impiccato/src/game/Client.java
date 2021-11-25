@@ -6,7 +6,6 @@ package game;
  * @author Gioele Cavallo
  * @version 07.10.2021
  */
-
 import exceptions.InvalidNameException;
 import exceptions.InvalidIpException;
 import helper.Helper;
@@ -15,17 +14,42 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
-public class Client {
+public class Client extends Thread {
 
     private static String SERVER_IP = "127.0.0.1";
     private static int SERVER_PORT = 9090;
-    private static Player player = new Player("Unknow");
-    
+    private static Player player;
+
     private PrintWriter out;
     private Socket socket;
     private ServerConnection serverCon;
-    
+
+    public Client(Player plr) throws InvalidNameException{
+        try {
+            player = plr;
+            this.socket = new Socket(SERVER_IP, SERVER_PORT);
+
+            // creazione della connessione al server tramite socket
+            this.serverCon = new ServerConnection(socket);
+
+            this.out = new PrintWriter(socket.getOutputStream(), true);
+
+            new Thread(serverCon).start();
+        }catch (IOException ex) {
+            System.out.println("impossible to create Client, maybe the server is busy.");
+            System.out.println("try in another time");
+        }
+        //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        
+    }
+    public Client() throws InvalidNameException {
+        this(new Player("Unknow"));
+        
+    }
+
+    /*
     public void startConnection(Player plr) throws IOException, InvalidNameException {
         this.player = plr;
         System.out.println(this.player);
@@ -54,7 +78,7 @@ public class Client {
         System.out.println(DateServer.getClientNumber());
         
     }
-
+     */
     public boolean checkName(String name) {
         return Helper.isValid(name);
     }
@@ -63,7 +87,7 @@ public class Client {
         String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
     }
 
-    public static void go() throws IOException {
+    public void go() throws IOException {
 
         System.out.println("Welcome to the client");
         BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
@@ -88,43 +112,83 @@ public class Client {
             }
         }
 
-        // creazione del socket per la connessione al server
-        Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+        this.start();
+    }
 
-        // creazione della connessione al server tramite socket
-        ServerConnection serverCon = new ServerConnection(socket);
+    @Override
+    public void run() {
+        try {
+            BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            // creazione del socket per la connessione al server
+            Socket socket = new Socket(SERVER_IP, SERVER_PORT);
 
-        new Thread(serverCon).start();
+            // creazione della connessione al server tramite socket
+            ServerConnection serverCon = new ServerConnection(socket);
 
-        // creazione del "pacchetto" di dati da trasmettere al ClientHandler con le richieste
-        String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
-        System.out.println("pack " + packet);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-        out.println(packet + "");
-        while (true) {
-            //packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
-            System.out.print("> ");
-            String command = keyboard.readLine();
+            new Thread(serverCon).start();
 
-            if (command.toLowerCase().equals("quit")) {
-                DateServer.removePlayer(player);
-                break;
-            } else if (command.toLowerCase().contains("get name")) {
-                System.out.println(player.getName());
+            // creazione del "pacchetto" di dati da trasmettere al ClientHandler con le richieste
+            String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
+            System.out.println("pack " + packet);
+
+            out.println(packet + "");
+            while (true) {
+                //packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
+                System.out.print("> ");
+                String command = keyboard.readLine();
+
+                if (command.toLowerCase().equals("quit")) {
+                    DateServer.removePlayer(player);
+                    break;
+                }
+                out.println(packet + command);
+
             }
-            out.println(packet + command);
-
+            //packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
+            out.println(packet + "close");
+            socket.close();
+            System.exit(0);
+        } catch (IOException ioe) {
+            System.out.println("Problem: IOException :(");
         }
-        //packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
-        out.println(packet + "close");
-        socket.close();
-        System.exit(0);
+    }
+    
+    public void sendPacket(String pack) /*throws InvalidNameException*/{
+        try {
+                    // socket
+        // serverConn
+        // out
+            String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
+
+            if (pack.toLowerCase().equals("quit")) {
+                this.out.println(packet + "close");
+                DateServer.removePlayer(player);
+                this.socket.close();
+                System.exit(0);
+            } else if (pack.toLowerCase().contains("get name")) {
+                System.out.println(player.getName());
+            } else if(pack.toLowerCase().startsWith("add ")){
+                //String name  = pack.substring(pack.indexOf(" ") + 1, pack.length());
+                System.out.println("PLAYER: "+player);
+                for (Player arr : DateServer.getPlayers()) {
+                    if (arr.equals(player)) {
+                        System.out.println("this name is already used");
+                    }
+                }
+                return;
+            }
+            this.out.println(packet + pack);
+
+        } catch (IOException ioe) {
+            System.out.println("Unable to send the packet");
+        }
     }
 
     public static void main(String[] args) throws IOException {
-        Client.go();
+        //Client.go();
     }
 
     public static void changeIp(String ip) throws InvalidIpException {

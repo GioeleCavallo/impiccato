@@ -39,7 +39,8 @@ public class ApplicationView extends javax.swing.JFrame {
         this.currentPanel = panel;
         this.getContentPane().add(panel);
         this.setVisible(true);
-        this.client = new Client();
+        
+        //this.client = new Client();
     }
    
     public void changePanel(JPanel panel){

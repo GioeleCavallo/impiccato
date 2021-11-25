@@ -4,9 +4,12 @@
  * and open the template in the editor.
  */
 package views.panels;
+
 import game.Player;
 import exceptions.*;
-import java.io.IOException;
+import game.Client;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import views.ApplicationView;
 
 /**
@@ -138,20 +141,55 @@ public class HomePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_joinGameBtActionPerformed
 
     private void createGameBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGameBtActionPerformed
+        //this.JFRAME.client.sendPacket("name");
         //System.out.println(this.JFRAME.client.getName());
+
         String name = usernameInput.getText();
         try {
 
-            this.JFRAME.client.startConnection(new Player(name));
-
+            //this.JFRAME.client.startConnection(new Player(name));
             this.JFRAME.player = new Player(name);
-            this.JFRAME.changePanel(new CreateGamePanel(this.JFRAME));
         } catch (InvalidNameException ine) {
-            usedNameErr.setVisible(true);
-        } catch(IOException ioe){
-            System.out.println("IOEXCEPTION");
+            invalidNameErr.setVisible(true);
+            return;
         }
+        try {
+            
+            this.JFRAME.client = new Client(this.JFRAME.player);
+            //this.JFRAME.client.sendPacket("add "+this.JFRAME.player.getName());
+            this.JFRAME.client.sendPacket("create game");
+        } catch (InvalidNameException ex) {
+            usedNameErr.setVisible(true);
+            return;
+        }
+        
+        
+        this.JFRAME.changePanel(new CreateGamePanel(this.JFRAME));
+
         /*boolean isRight = true;
+        if (Helper.isValid(name)) {
+        ArrayList<Player> arr = DateServer.getPlayers();
+        for (int i = 0; i < arr.size(); i++) {
+        if (arr.get(i).getName().equals(name)) {
+        usedNameErr.setVisible(true);
+        isRight = false;
+        }
+        }
+        } else {
+        invalidNameErr.setVisible(true);
+        isRight = false;
+        }*/
+        //if (isRight) {
+        // this.JFRAME.changePanel(new CreateGamePanel(this.JFRAME));
+        /* //crea il giocatore ed inizia la partita
+        Player plr = new Player(name);
+        DateServer.addPlayer(plr);
+        int[] values = new int[]{this.getX(),this.getY()};
+        this.dispose();
+        CreateGameView.startView(values);
+        }*/
+
+ /*boolean isRight = true;
         if (Helper.isValid(name)) {
             ArrayList<Player> arr = DateServer.getPlayers();
             for (int i = 0; i < arr.size(); i++) {
@@ -181,7 +219,7 @@ public class HomePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_usernameInputActionPerformed
 
     private void settingsBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsBtActionPerformed
-       this.JFRAME.changePanel(new SettingsPanel(this.JFRAME));
+        this.JFRAME.changePanel(new SettingsPanel(this.JFRAME));
     }//GEN-LAST:event_settingsBtActionPerformed
 
 

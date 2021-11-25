@@ -5,6 +5,7 @@ package game;
  * @author Gioele Cavallo
  * @version 30.09.2021
  */
+import exceptions.InvalidNameException;
 import helper.Helper;
 import java.lang.*;
 import java.util.ArrayList;
@@ -20,15 +21,15 @@ public class Player {
     private boolean finished;
     private ArrayList<String> guessedChars;
 
-    public Player(String name) {
+    public Player(String name) throws InvalidNameException {
         this(name, " ", 0);
     }
 
-    public Player(String name, String token) {
+    public Player(String name, String token) throws InvalidNameException {
         this(name, token, 0);
     }
 
-    public Player(String name, String token, int points) {
+    public Player(String name, String token, int points) throws InvalidNameException {
         if (Helper.isValid(name)) {
             this.name = name;
             this.token = token;
@@ -39,7 +40,7 @@ public class Player {
             this.guessedChars = new ArrayList<>();
             this.finished = false;
         } else {
-            throw new IllegalArgumentException("The name is not valid");
+            throw new InvalidNameException();
         }
     }
 
@@ -140,9 +141,6 @@ public class Player {
     }
 
     public static void main(String[] args) {
-        Player plr = new Player("Gioele", "abc");
-        System.out.println(plr.name);
-        System.out.println(plr.token);
-        System.out.println(plr.points);
+        
     }
 }

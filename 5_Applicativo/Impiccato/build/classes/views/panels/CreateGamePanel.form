@@ -22,12 +22,12 @@
               <EmptySpace max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace pref="167" max="32767" attributes="0"/>
+              <EmptySpace pref="153" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="timeDurationLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="roundsCountLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="timeDurationLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="roundsCountLabel1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -55,7 +55,7 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="roundsCountSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="roundsCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="roundsCountLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="77" max="32767" attributes="0"/>
               <Component id="CreateButton2" min="-2" pref="46" max="-2" attributes="0"/>
@@ -90,12 +90,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="timeDurationLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Time (sec.)"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="roundsCountLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Rounds"/>
+        <Property name="text" type="java.lang.String" value="Time (sec. &gt;= 30)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="CreateButton2">
@@ -115,6 +110,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="GoBackButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="roundsCountLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Rounds (&gt;0)"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
