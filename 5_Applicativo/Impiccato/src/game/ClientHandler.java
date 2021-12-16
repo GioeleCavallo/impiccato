@@ -6,7 +6,6 @@ package game;
  * @author gioelecavallo
  * @version 07.10.2021
  */
-import exceptions.InvalidNameException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,21 +36,8 @@ public class ClientHandler implements Runnable {
         out = new PrintWriter(client.getOutputStream(), true);
     }
 
-    public String getRandomName() {
-        return DateServer.getRandomName();
-    }
-    
-    /*public void addPlayer(Player plr) throws InvalidNameException {
-        DateServer.addPlayer(plr);
-        ArrayList<Player> players = DateServer.getPlayers();
-        for(Player plr2 : players){
-            System.out.println(plr2);
-        }
-        player = plr;
-    }*/
-
-    //@Override
-    public void run() throws IllegalArgumentException{
+    @Override
+    public void run() {
         try {
             while (true) {
                 System.out.println("Attending reply");
@@ -74,7 +60,6 @@ public class ClientHandler implements Runnable {
                 for (Player plr : players) {
                     if (plr.getName().equals(player.getName())) {
                         counter++;
-                        out.println("count: "+counter);
                     }
                 }
                 request = request.substring(request.indexOf("%", request.indexOf("%") + 1) + 1, request.length());
@@ -82,33 +67,18 @@ public class ClientHandler implements Runnable {
                 boolean canRun = true;
                 if (counter == 0) {
                     DateServer.addPlayer(player);
-                } else /*if (counter > 1 && !request.startsWith("changed name,"))*/ {
+                } else if (counter > 1 /*&& !request.startsWith("changed name,")*/) {
+                    out.println("Your name is taked");
                     canRun = false;
-                    //throw new IllegalArgumentException("Name already used");
                 }
                 player = DateServer.getPlayer(player);
                 request = request.substring(request.indexOf("%", request.indexOf("%") + 1) + 1, request.length());
                 this.player = player;
-                if(request.equals("nothing")){
-                    
-                    return;
-                }
                 if (canRun && !player.isOnGameStarted()) {
 
                     if (request.equals("name")) {
                         out.println(DateServer.getRandomName());
-                    } /*else if (request.toLowerCase().startsWith("check ")) {
-                        String namePlr = request.substring(request.indexOf(" ") + 1, pack.length());
-                        ArrayList<Player> arr = DateServer.getPlayers();
-                        for (int i = 0; i < arr.size(); i++) {
-                            System.out.println(arr.get(i));
-                            if (arr.get(i).getName().equals(namePlr)) {
-                                //throw InvalidNameException();
-                            }
-                        }
-                        //System.out.println(player.getName());
-
-                    } */ else if (request.startsWith("say")) {
+                    } else if (request.startsWith("say")) {
                         int firstSpace = request.indexOf(" ");
                         if (firstSpace != -1) {
                             outToAll(request.substring(firstSpace + 1), player);
@@ -157,8 +127,7 @@ public class ClientHandler implements Runnable {
                         } else {
                             out.println("you aren't plaing yet");
                         }
-                    }
-                    if (request.equals("start game")) {
+                    } else if (request.equals("start game")) {
                         if (Helper.isOnAGame(player, DateServer.getGameHandler())) {
                             Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
                             if (player.getAdmin() && !gm.getStarted()) {
@@ -255,11 +224,11 @@ public class ClientHandler implements Runnable {
                         if (word.toLowerCase().contains(Character.toString(letter).toLowerCase())) {
                             player.addGuessedChar(Character.toString(letter).toLowerCase());
                         } else {
-                            if (letter >= 'a' && letter <= 'z' || letter >= 'A' && letter <= 'Z') {
+                            if(letter >= 'a' && letter <= 'z' || letter >= 'A' && letter <= 'Z'){
                                 player.addErrors(1);
                             }
                         }
-                        out.println("round : " + gm.getCurrentRound());
+                        out.println("round : "+gm.getCurrentRound());
                         out.println("guessed chars -> " + player.getGuessedChars().toString());
                         for (int i = 0; i < word.length(); i++) {
                             censuredWord += (Helper.charsArrayContainsChar(player.getGuessedChars(), word.charAt(i))) ? word.charAt(i) : "*";
@@ -299,8 +268,6 @@ public class ClientHandler implements Runnable {
             /*System.err.println("IO Exception in client handler");
             System.err.println(ioe.getStackTrace());*/
 
-        } catch (InvalidNameException ex) {
-           // Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             out.close();
             try {
@@ -326,11 +293,10 @@ public class ClientHandler implements Runnable {
             }
         }
     }
-
     public void outToGameChar(Player plr, String message) {
         for (ClientHandler aClient : clients) {
-            if (aClient.getPlayer().getToken().equals(plr.getToken())
-                    && !aClient.getPlayer().getName().equals(plr.getName())) {
+            if (aClient.getPlayer().getToken().equals(plr.getToken()) &&
+                !aClient.getPlayer().getName().equals(plr.getName())) {
                 aClient.out.println(message);
             }
         }

@@ -4,14 +4,13 @@ package game;
  *
  * @author gioele.cavallo
  */
-import exceptions.InvalidNameException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ApplicationHandler {
 
-    public static void main(String[] args) throws IOException, InvalidNameException {
+    public static void main(String[] args) throws IOException {
         BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
         boolean choise = false;
         while (!choise) {
@@ -22,8 +21,8 @@ public class ApplicationHandler {
                 DateServer.go();
             } else if (command.equals("c")) {
                 choise = true;
-                (new Client()).go();
+                Client.go();
             }
-        }
-    }
+        } 
+   }
 }

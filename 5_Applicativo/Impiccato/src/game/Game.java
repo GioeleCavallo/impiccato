@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 
 public class Game {
@@ -116,9 +118,9 @@ public class Game {
     }
 
     public void startGame() {
-
+        
         this.startTime = System.currentTimeMillis();
-        //this.currentRound = -1;
+        this.currentRound = -1;
         for (Player plr : this.players) {
             plr.setIsOnGameStarted(true);
         }
@@ -126,46 +128,42 @@ public class Game {
         for (ClientHandler aClient : clients) {
             aClient.outToGame(this.getPlayers().get(0), " Game started");
         }
-        startRound();
-        //this.startTimer(500);
+        this.startTimer(500);
     }
 
     public void endGame() {
-        // print podium
-
         List<Player> players = this.getPlayers();
         ArrayList<ClientHandler> clients = DateServer.getClientHandler();
         for (ClientHandler aClient : clients) {
             aClient.outToGame(this.getPlayers().get(0), "Game finished!!!");
         }
-        /**
-         * for (Player plr : players) {
-         * DateServer.removePlayerFromGame(DateServer.getPlayer(plr)); }
-         */
-
-        for (int i = 0; i < players.size(); i++) {
-            DateServer.removePlayerFromGame(DateServer.getPlayer(players.get(i)));
+        /**for (Player plr : players) {
+            DateServer.removePlayerFromGame(DateServer.getPlayer(plr));
+        }*/
+        
+        for( int i = 0; i < players.size(); i++ ){
+            DateServer.removePlayerFromGame(DateServer.getPlayer(players.get(i)));     
         }
-
+        
         DateServer.removeGame(this);
     }
 
-    ActionListener taskPerformer = new ActionListener() {
-        public void actionPerformed(ActionEvent evt) {
-            endRound();
-            DateServer.endRoundInfo(getToken());
-            currentRound++;
-            startRound();
-
-        }
-    };
-
     private void startTimer(int time) {
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                endRound();
+                DateServer.endRoundInfo(getToken());
+                startRound();
 
+            }
+        };
         Timer timer = new Timer(time, taskPerformer);
         timer.setRepeats(false);
         timer.start();
 
+        try {
+            Thread.sleep(time + 800);
+        } catch (InterruptedException ex) {}
     }
 
     public void endRound() {
@@ -174,7 +172,7 @@ public class Game {
     }
 
     public void startRound() {
-        
+        this.currentRound++;
         if (this.currentRound < this.rounds) {
             this.startTimer(this.time * 1000 + 800);
             ArrayList<ClientHandler> clients = DateServer.getClientHandler();
@@ -185,7 +183,7 @@ public class Game {
             for (Player plr : players) {
                 DateServer.getPlayer(plr).setFinished(false);
             }
-        } else {
+        }else{
             this.endGame();
         }
     }

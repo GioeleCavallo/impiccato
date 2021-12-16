@@ -6,11 +6,12 @@ package game;
  * @author Gioele Cavallo
  * @version 07.09.2021
  */
-
-import exceptions.InvalidNameException;
+import java.io.BufferedReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,10 @@ public class DateServer {
     private static ExecutorService pool = Executors.newFixedThreadPool(4);
     private static ArrayList<Player> players = new ArrayList<>();
     private static GameHandler gameHandler = new GameHandler();
+
+    public static void main(String[] args) {
+
+    }
 
     public static ArrayList<ClientHandler> getClientHandler() {
         return clients;
@@ -48,12 +53,7 @@ public class DateServer {
         return clients.size();
     }
 
-    public static void addPlayer(Player player) throws InvalidNameException {
-        for(Player plr : players){
-            if(plr.getName().equals(player.getName())){
-                throw new InvalidNameException();
-            }
-        }
+    public static void addPlayer(Player player) {
         players.add(player);
     }
 
@@ -146,9 +146,5 @@ public class DateServer {
     public static String getRandomName() {
         String name = names[(int) (Math.random() * names.length)];
         return name;
-    }
-    
-    public static void main(String[] args) throws IOException{
-        DateServer.go();
     }
 }
