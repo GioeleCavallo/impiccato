@@ -19,6 +19,7 @@ public class GameHandler {
         return this.games;
     }
 
+    
     public LinkedList<Player> getPlayers() {
         LinkedList<Player> plr = new LinkedList<Player>();
         for (int i = 0; i < this.games.size(); i++) {
@@ -35,6 +36,12 @@ public class GameHandler {
         this.games.remove(game);
     }
 
+    /**
+     * Questo metodo ritorna una partita in base al token passatogli.
+     * 
+     * @param token : il token della partita da cercare.
+     * @return il gioco che trovato che ha come token il token passatos. 
+     */
     public Game getGameFromToken(String token) {
         for (Game gm : this.games) {
             if (gm.getToken().equals(token)) {
