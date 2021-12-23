@@ -46,17 +46,15 @@ public class DateServer {
         return clients.size();
     }
 
-    public static void addPlayer(Player player) {
+    public static void addPlayer(Player player) /*throws InvalidNameException*/ {
+        /*for (Player plr : players) {
+            if (plr.getName().equals(player.getName())) {
+                throw new InvalidNameException();
+            }
+        }*/
         players.add(player);
     }
 
-    /**
-     * Questo metodo aggiunge un determinato player alla partita 
-     * avente lo stesso token.
-     * 
-     * @param player : giocatore da aggiungere alla partita.
-     * @param token : il token della partita alla quale deve essere aggiunto.
-     */
     public static void addPlayerOnGame(Player player, String token) {
         LinkedList<Game> games = gameHandler.getGames();
         for (Game gm : games) {
@@ -68,14 +66,6 @@ public class DateServer {
 
     }
 
-    
-    /**
-     * Questo metodo, in base ai parametri passati, cerca il giocaotre con 
-     * nome name e setta il suo attributo admin con il valore admin passatogli.
-     * 
-     * @param name : nome del giocatore al quale il valore admin.
-     * @param admin : valore boolean del valore admin da settare al giocatore.
-     */
     public static void setAdmin(String name, boolean admin) {
         for (Player plr : players) {
             if (plr.getName().equals(name)) {
@@ -99,26 +89,15 @@ public class DateServer {
         removePlayerFromGame(player);
     }
 
-    /**
-     * Questo metodo esegue delle operazioni quando si vuole 
-     * eliminare un player da una partita.
-     * 
-     * @param plr : player da togliere dalla partita.
-     */
-    
     public static void removePlayerFromGame(Player plr) {
         for (Game gm : gameHandler.getGames()) {
             if (gm.getToken().equals(plr.getToken())) {
-                plr = getPlayer(plr); 
-                gm.removePlayer(plr); // rimuove il player dalla partita
-                plr.setAdmin(false); // setta l'attributo admin a false
-                
-                // setta l'attrbuto isOnGame a false
+                plr = getPlayer(plr);
+                gm.removePlayer(plr);
+                plr.setAdmin(false);
                 plr.setIsOnGameStarted(false);
-                plr.setErrors(0); // toglie tutti gli errori fatti
-                
-                // elimina tutti i char sbaglaiti dalla lista
-                plr.getGuessedChars().removeAll(plr.getGuessedChars()); 
+                plr.setErrors(0);
+                plr.getGuessedChars().removeAll(plr.getGuessedChars());
                 return;
             }
         }
@@ -171,19 +150,12 @@ public class DateServer {
         }
     }
 
-    /**
-     * Questo metodo é utilizzato per debugging, infatti per testare 
-     * se la connessione al server esiste uso questo metodo che 
-     * ritorna un nome casuale.
-     * 
-     * @return un nome casuale preso dall'array name.
-     */
     public static String getRandomName() {
         String name = names[(int) (Math.random() * names.length)];
         return name;
     }
 
     public static void main(String[] args) throws IOException {
-        DateServer.go();
+        //DateServer.go();
     }
 }

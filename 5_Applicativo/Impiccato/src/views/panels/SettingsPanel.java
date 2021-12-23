@@ -15,8 +15,6 @@ public class SettingsPanel extends javax.swing.JPanel {
  private final ApplicationView JFRAME;
     /**
      * Creates new form SettingsPanel
-     * 
-     * @param jFrame : il JFrame dal quale dipende.
      */
     public SettingsPanel(ApplicationView jFrame) {
         this.JFRAME = jFrame;

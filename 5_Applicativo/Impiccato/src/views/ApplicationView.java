@@ -8,8 +8,6 @@ package views;
 import game.Client;
 import game.Player;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import views.panels.*;
 
@@ -44,10 +42,7 @@ public class ApplicationView extends javax.swing.JFrame {
     }
    
     /**
-     * Questo metodo viene utilizzato percambiare dal JPanel 
-     * corrente a quello passatogli.
-     * 
-     * @param panel : il nuovo pannello da mostrare.
+     * @param panel : il nuovo pannello da mostrare
      */
     public void changePanel(JPanel panel){
         if(panel instanceof CreateGamePanel){
@@ -124,6 +119,20 @@ public class ApplicationView extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new ApplicationView();
+                } catch (IOException ex) {
+                     
+                   //  Logger.getLogger(ApplicationView.class.getName()).log(Level.SEVERE, null, ex);
+                     System.out.println("unable to start the application");
+                }
+            }
+        });
+    }
+    
+    public static void go(){
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {

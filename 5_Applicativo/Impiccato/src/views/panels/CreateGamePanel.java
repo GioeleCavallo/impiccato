@@ -5,10 +5,7 @@
  */
 package views.panels;
 
-import game.Player;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import views.ApplicationView;
 
 /**
@@ -21,8 +18,6 @@ public class CreateGamePanel extends javax.swing.JPanel {
 
     /**
      * Creates new form CreateGamePanel
-     * 
-     * @param jFrame : il JFrame dal quale dipende.
      */
     public CreateGamePanel(ApplicationView jFrame) {
         this.JFRAME = jFrame;
@@ -115,9 +110,8 @@ public class CreateGamePanel extends javax.swing.JPanel {
         int rounds = (Integer)roundsCountSpinner.getValue();
         int time = (Integer)timeDurationSpinner.getValue();
         boolean right = true;
-        // controlla se i valori sono stati settati correttamente
         if(rounds <= 0){
-            roundsCountSpinner.setValue(1);
+            roundsCountSpinner.setValue(0);
             right = false;
         }
         if(time < 30){
@@ -129,7 +123,7 @@ public class CreateGamePanel extends javax.swing.JPanel {
             this.JFRAME.client.sendPacket("create game");
             
             this.JFRAME.client.sendPacket("set time "+time);
-            this.JFRAME.client.sendPacket("set rounds "+rounds);
+            this.JFRAME.client.sendPacket("set rounds "+time);
             try {
                 Thread.sleep(250);
             } catch (InterruptedException ex) {}

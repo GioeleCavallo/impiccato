@@ -16,8 +16,6 @@ public class FinalPanel extends javax.swing.JPanel {
     private final ApplicationView JFRAME;
     /**
      * Creates new form FinalPanel
-     * 
-     * @param jFrame : il JFrame dal quale dipende.
      */
     public FinalPanel(ApplicationView jFrame) {
         this.JFRAME = jFrame;

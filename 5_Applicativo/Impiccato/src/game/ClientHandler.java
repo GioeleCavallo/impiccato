@@ -40,6 +40,15 @@ public class ClientHandler implements Runnable {
         return DateServer.getRandomName();
     }
 
+    /*public void addPlayer(Player plr) throws InvalidNameException {
+        DateServer.addPlayer(plr);
+        ArrayList<Player> players = DateServer.getPlayers();
+        for(Player plr2 : players){
+            System.out.println(plr2);
+        }
+        player = plr;
+    }*/
+    //@Override
     public void run() throws IllegalArgumentException {
         try {
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -48,20 +57,23 @@ public class ClientHandler implements Runnable {
                 System.out.println("Attending reply ");
                 String request = in.readLine();
 
-                // per debugging controllo cosa mi viene mandato
+                //out.println("RECIVED");
                 System.out.println(request);
+                //out.println("RECIVED2");
 
                 String playerIdentifier = "";
                 if (request != null) {
                     if (request.length() > 4) {
                         playerIdentifier = request.substring(request.indexOf("%") + 1, request.indexOf("%", request.indexOf("%") + 1));
                     } else {
+                        //out.println("piccola");
                         return;
                     }
                 } else {
+                    //out.println("nulla");
                     return;
                 }
-
+                //out.println("RECIVED3");
                 if (request.equals("refresh")) {
                     String players = "";
                     List<Player> plrs = DateServer.getGameHandler().getGameFromToken(player.getToken()).getPlayers();
@@ -82,10 +94,16 @@ public class ClientHandler implements Runnable {
                 boolean canRun = true;
 
                 request = request.substring(request.indexOf("%", request.indexOf("%") + 1) + 1, request.length());
+                /*if(DateServer.getPlayer(player) == null){
+                    DateServer.addPlayer(player);
+                }
+                player = DateServer.getPlayer(player);
+                this.player = player;
+                 */
 
                 if (request.toLowerCase().startsWith("check ")) {
                     String namePlr = request.substring(request.indexOf(" ") + 1, request.length());
-
+                    //out.println("name: "+namePlr);
                     ArrayList<Player> arr = DateServer.getPlayers();
                     for (int i = 0; i < arr.size(); i++) {
                         if (arr.get(i).getName().equals(namePlr)) {
@@ -138,11 +156,11 @@ public class ClientHandler implements Runnable {
                         if (!Helper.isOnAGame(player, DateServer.getGameHandler())) {
                             int firstSpace = request.indexOf(" ");
                             if (firstSpace != -1) {
-
+                                
                                 String tokenGame = request.substring(firstSpace + 1);
                                 String tokenPlayer = player.getToken();
                                 Game game = DateServer.getGameHandler().getGameFromToken(tokenGame);
-                                if (game == null) {
+                                if(game == null){
                                     out.println("token not valid");
                                     return;
                                 }
@@ -176,7 +194,19 @@ public class ClientHandler implements Runnable {
                         Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
                         gm.setStarted(true);
                         gm.startGame();
-
+                        /*if (Helper.isOnAGame(player, DateServer.getGameHandler())) {
+                            Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
+                            if (player.getAdmin() &&  !gm.getStarted()) {
+                                gm.setStarted(true);
+                                //gm.startGame();
+                                out.println("the game started!");
+                                request = "";
+                            } else {
+                                out.println("you are not the admin of this game or the game is already started!");
+                            }
+                        } else {
+                            out.println("you are not on a game");
+                        }*/
                     } else if (request.startsWith("set time ")) {
                         out.println("player: " + player);
                         Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
@@ -242,16 +272,74 @@ public class ClientHandler implements Runnable {
                         System.out.printf("count of %s players (%s)%n", DateServer.getPlayers().size(), DateServer.getClientNumber());
                     }
                 } else if (player.isOnGameStarted()) { // il giocatore é dentro una partita iniziata
-
+                    //System.out.println("IS ON GAME");
                     this.isOnGame(player, request, out);
                     return;
+                    /*Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
+
+                    
+                    /*if (gm.getRounds() <= gm.getCurrentRound()) {
+                        out.println("finished the game !!!");
+                        DateServer.removePlayerFromGame(player);
+                        player.getGuessedChars().removeAll(player.getGuessedChars());
+                        player.setErrors(0);
+                        return;
+                    }
+                    if (!player.getFinished()) {
+                        String word = gm.getWords().get(gm.getCurrentRound());
+                        String censuredWord = "";
+
+                        char letter = (request.length() > 0) ? request.charAt(0) : ' ';
+                        outToGameChar(player, "[" + player.getName() + "] " + letter);
+                        if (word.toLowerCase().contains(Character.toString(letter).toLowerCase())) {
+                            player.addGuessedChar(Character.toString(letter).toLowerCase());
+                        } else {
+                            if (letter >= 'a' && letter <= 'z' || letter >= 'A' && letter <= 'Z') {
+                                player.addErrors(1);
+                            }
+                        }
+                        out.println("round : " + gm.getCurrentRound());
+                        out.println("guessed chars -> " + player.getGuessedChars().toString());
+                        for (int i = 0; i < word.length(); i++) {
+                            censuredWord += (Helper.charsArrayContainsChar(player.getGuessedChars(), word.charAt(i))) ? word.charAt(i) : "*";
+                        }
+                        out.println(censuredWord + " -- " + word);
+                        out.println("errors: " + player.getErrors() + " / 10");
+                        if (player.getErrors() >= 10) {
+                            out.println("FINISHED FOR ERRORS");
+                            out.println("errors: " + player.getErrors() + "/" + gm.getMaxErrors());
+                            out.println("points: " + player.getPoints());
+                            //gm.endRound();
+
+                            player.getGuessedChars().removeAll(player.getGuessedChars());
+                            player.setErrors(0);
+                            player.setFinished(true);
+                            //return;
+                        }
+                        if (censuredWord.equals(word)) {
+                            out.println("you win the round :)");
+                            player.getGuessedChars().removeAll(player.getGuessedChars());
+                            player.setErrors(0);
+                            long time = System.currentTimeMillis();
+                            out.printf("%s - %s%n", time / 1000, gm.getStartTime() / 1000);
+                            int points = gm.getTime() - (int) ((time - gm.getStartTime()) / 1000);
+                            out.println("points: " + points);
+                            player.addPoints(points);
+                            player.setFinished(true);
+                            //gm.endRound();
+                        }
+                    } else {
+                        out.println("wait until the round finish");
+                    }*/
 
                 }
             }
         } catch (IOException ioe) {
+            /*System.err.println("IO Exception in client handler");
+            System.err.println(ioe.getStackTrace());*/
 
         } catch (InvalidNameException ex) {
-            out.println("name not good");
+            out.println("name not good");//Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             out.println("into final");
             out.close();
@@ -288,17 +376,81 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /*public void endActions(Game gm, Player plr, PrintWriter out){
+        gm.endRound();
+        if(gm.getRounds() == gm.getCurrentRound()+1){
+            out.println("finished the game !!!");
+            DateServer.removePlayerFromGame(plr);
+        }
+        plr.getGuessedChars().removeAll(plr.getGuessedChars());
+        plr.setErrors(0);
+    }*/
     private void isOnGame(Player player, String request, PrintWriter out) {
         Game gm = DateServer.getGameHandler().getGameFromToken(player.getToken());
         String word = gm.getWords().get(gm.getCurrentRound());
         if (word.toLowerCase().contains(Character.toString(request.charAt(0)).toLowerCase())) {
             player.addGuessedChar(Character.toString(request.charAt(0)).toLowerCase());
-            out.println("y" + request.charAt(0));
-        } else {
+            out.println("y"+request.charAt(0));
+        }else{
             player.addErrors(1);
             out.println("n");
         }
         return;
+       
+            /*if (gm.getRounds() <= gm.getCurrentRound()) {
+            out.println("finished the game !!!");
+            DateServer.removePlayerFromGame(player);
+            player.getGuessedChars().removeAll(player.getGuessedChars());
+            player.setErrors(0);
+            return;
+        }*/
 
+           /* if (!player.getFinished()) {
+                String word = gm.getWords().get(gm.getCurrentRound());
+                String censuredWord = "";
+
+                char letter = (request.length() > 0) ? request.charAt(0) : ' ';
+                outToGameChar(player, "[" + player.getName() + "] " + letter);
+                if (word.toLowerCase().contains(Character.toString(letter).toLowerCase())) {
+                    player.addGuessedChar(Character.toString(letter).toLowerCase());
+                } else {
+                    if (letter >= 'a' && letter <= 'z' || letter >= 'A' && letter <= 'Z') {
+                        player.addErrors(1);
+                    }
+                }
+                out.println("round : " + gm.getCurrentRound());
+                out.println("guessed chars -> " + player.getGuessedChars().toString());
+                for (int i = 0; i < word.length(); i++) {
+                    censuredWord += (Helper.charsArrayContainsChar(player.getGuessedChars(), word.charAt(i))) ? word.charAt(i) : "*";
+                }
+                out.println(censuredWord + " -- " + word);
+                out.println("errors: " + player.getErrors() + " / 10");
+                if (player.getErrors() >= 10) {
+                    out.println("FINISHED FOR ERRORS");
+                    out.println("errors: " + player.getErrors() + "/" + gm.getMaxErrors());
+                    out.println("points: " + player.getPoints());
+                    //gm.endRound();
+
+                    player.getGuessedChars().removeAll(player.getGuessedChars());
+                    player.setErrors(0);
+                    player.setFinished(true);
+                    //return;
+                }
+                if (censuredWord.equals(word)) {
+                    out.println("you win the round :)");
+                    player.getGuessedChars().removeAll(player.getGuessedChars());
+                    player.setErrors(0);
+                    long time = System.currentTimeMillis();
+                    out.printf("%s - %s%n", time / 1000, gm.getStartTime() / 1000);
+                    int points = gm.getTime() - (int) ((time - gm.getStartTime()) / 1000);
+                    out.println("points: " + points);
+                    player.addPoints(points);
+                    player.setFinished(true);
+                    //gm.endRound();
+                }
+            } else {
+                out.println("wait until the round finish");
+            }*/
+
+        }
     }
-}

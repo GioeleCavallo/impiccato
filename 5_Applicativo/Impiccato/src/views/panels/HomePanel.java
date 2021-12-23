@@ -22,8 +22,6 @@ public class HomePanel extends javax.swing.JPanel {
 
     /**
      * Creates new form HomePanel
-     * 
-     * @param jFrame : il JFrame dal quale dipende.
      */
     public HomePanel(ApplicationView jFrame) {
         this.JFRAME = jFrame;

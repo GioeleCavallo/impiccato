@@ -7,15 +7,12 @@
  */
 package helper;
 
-import game.ApplicationHandler;
-import game.ApplicationHandler;
 import game.DateServer;
 import game.GameHandler;
 import game.Game;
 import game.Player;
 import java.util.ArrayList;
 
-import java.util.LinkedList;
 
 public class Helper {
 

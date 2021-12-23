@@ -37,21 +37,39 @@ public class Client extends Thread {
     public String comunication;
     
     private Thread threadConnection;
-    
-    
-    /**
-     * 
-     * @param jFrame : JFrame al quale appartiene il client
-     */
+
+    public String getError() {
+        return this.error;
+    }
+
+    public static Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayers(ArrayList<String> plrs) {
+        this.players = plrs;
+        if(this.JFRAME.getCurrentPanel() instanceof GamePanel gP){
+            gP.refreshTable();
+        }
+    }
+
+    public ArrayList<String> getPlayers() {
+        return this.players;
+    }
+
+    public void setError(String error) {
+        System.out.println("YEAA");
+        this.error = error;
+    }
+
+    public void setToken(String token) {
+        player.setToken(token);
+    }
+
     public Client(ApplicationView jFrame) throws InvalidNameException {
         this(new Player("Unknow"), jFrame);
     }
 
-    /**
-     * 
-     * @param plr : player associato al client
-     * @param jFrame : JFrame al quale appartiene il client
-     */
     public Client(Player plr, ApplicationView jFrame) {
         this.JFRAME = jFrame;
         try {
@@ -74,40 +92,6 @@ public class Client extends Thread {
             System.out.println("impossible to create Client, maybe the server is busy.");
             System.out.println("try in another time");
         }
-    }
-
-
-    public String getError() {
-        return this.error;
-    }
-
-    public static Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayers(ArrayList<String> plrs) {
-        this.players = plrs;
-        if(this.JFRAME.getCurrentPanel() instanceof GamePanel gP){
-            gP.refreshTable();
-        }
-    }
-
-    public ArrayList<String> getPlayers() {
-        return this.players;
-    }
-
-    /**
-     * usato per comunicare se ci sono degli errori come 
-     * il nome del player già utilizzato.
-     * 
-     * @param error : l'errore da segnalare
-     */
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public void setToken(String token) {
-        player.setToken(token);
     }
 
     public void openConnection() throws IOException {
@@ -139,7 +123,7 @@ public class Client extends Thread {
     }
     
     /**
-     * @param msg : il messaggio da mandare al server 
+     * @param pack : il messaggio da mandare al server 
      */
     public void sendPacket(String msg) {
         try {
@@ -168,15 +152,91 @@ public class Client extends Thread {
         }
     }
 
+    /*
+    public void startConnection(Player plr) throws IOException, InvalidNameException {
+        this.player = plr;
+        System.out.println(this.player);
+        System.out.println("Welcome to the client");
+        //BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+        Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+        ServerConnection serverCon = new ServerConnection(socket);
+
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.socket = new Socket(SERVER_IP, SERVER_PORT);
+
+        // creazione della connessione al server tramite socket
+        this.serverCon = new ServerConnection(socket);
+
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        new Thread(serverCon).start();
+        if (checkName(plr.getName())) {
+            try {
+                throw InvalidNameException();
+            } catch (Exception ex) {
+                //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        DateServer.addPlayer(player);
+        System.out.println(DateServer.getClientNumber());
+        
+    }
+     */
     public boolean checkName(String name) {
         return Helper.isValid(name);
     }
 
+    /*public void changeName() {
+        String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
+    }*/
+    //codice per programma al terminale
+    /*
+    public void go() {
+
+        System.out.println("Welcome to the client");
+        BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+        boolean isSetted = false;
+        try {
+            // ciclo per settare il nome dell' utente
+            while (!isSetted) {
+                System.out.println("Please tip a name:");
+                System.out.print("> ");
+                String name = keyboard.readLine();
+                if (Helper.isValid(name)) {
+                    isSetted = true;
+                    for (Player arr : DateServer.getPlayers()) {
+                        if (arr.equals(player)) {
+                            isSetted = false;
+                            System.out.println("this name is already used");
+                        }
+                    }
+                    if (isSetted) {
+                        player.setName(name);
+                        System.out.println("Hi " + player.getName());
+                    }
+                } else {
+                    System.out.println("Invalid name, please rewrite it.");
+                }
+            }
+        } catch (IOException ioe) {
+            System.out.println("problem in Client read keyboard");
+        }
+
+        this.start();
+    }
+     */
     @Override
     public void run() {
         try {
             BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 
+            // creazione del socket per la connessione al server
+            //Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+            // creazione della connessione al server tramite socket
+            //ServerConnection serverCon = new ServerConnection(socket);
+            //PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            //new Thread(serverCon).start();
+            // creazione del "pacchetto" di dati da trasmettere al ClientHandler con le richieste
             String packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
             System.out.println("pack " + packet);
 
@@ -193,7 +253,7 @@ public class Client extends Thread {
                 out.println(packet + command);
 
             }
-            
+            //packet = "%" + player.getName() + "," + player.getToken() + "," + player.getPoints() + "%";
             out.println(packet + "close");
             socket.close();
             System.exit(0);

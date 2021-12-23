@@ -21,12 +21,10 @@ public class GamePanel extends javax.swing.JPanel {
 
     /**
      * Creates new form GamePanel
-     * 
-     * @param jFrame : il JFrame dal quale dipende.
      */
     public GamePanel(ApplicationView jFrame) {
         this.JFRAME = jFrame;
-        
+        //this.JFRAME.client.sendPacket("join "+this.JFRAME.client.getPlayer().getToken());
         initComponents();
         if(this.JFRAME.client.getPlayer() != null){
             this.tokenLabel.setText("token: " + this.JFRAME.client.getPlayer().getToken());
@@ -193,10 +191,6 @@ public class GamePanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_letterInputActionPerformed
    
-    
-    /**
-     * Questo metodo serve per fare un refresh dei player nella tabella
-     */
     public void refreshTable(){
         ArrayList<String> arr = this.JFRAME.client.getPlayers();
         if(arr != null){

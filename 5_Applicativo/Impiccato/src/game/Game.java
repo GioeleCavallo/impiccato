@@ -199,6 +199,7 @@ public class Game {
     }
 
     public static List<String> generateWords(int numberWords) {
+        System.out.println("begin");
         List<String> words = new ArrayList<String>();
         Path path = Paths.get(".", "Files", "words.txt");
         try {
